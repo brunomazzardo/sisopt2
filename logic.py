@@ -2,16 +2,28 @@
 from struct import Process, Page
 import time
 from random import randint
+from threading import Thread
+from numpy.random import choice
 
 
 class Logic:
     def __init__(self):
         self.contador_tempo = time.clock()
         self.MAX_PROCS = 15
+        self.num_threads = 4
+        self.chance_morrer = 0.1
+        self.chance_alocar = 0.1
+
+    def thread_func(self):
+        print
+
+    def comando_aleatorio(self, nome):
+        chance_acessar = 1 - (self.chance_morrer + self.chance_alocar)
+        return choice(3, 1, p=[self.chance_alocar, self.chance_morrer, chance_acessar])
 
     def run(self):
-
         f = open('./entrada.txt', 'r')
+        self.modo = f.readline().rstrip()
         self.alg = f.readline().rstrip()
         self.tamanho_pagina = int(f.readline())
         self.tamanho_memoria = int(f.readline()) / self.tamanho_pagina
@@ -28,26 +40,28 @@ class Logic:
         print 'Tamanho da pagina: ' + str(self.tamanho_memoria)
         print 'Tamanho da memoria: ' + str(self.tamanho_memoria)
         print 'Tamanho do disco: ' + str(self.tamanho_disco)
-
-        for linha in f:
-            data = linha.split(' ')
-            acao = data[0]
-            nome = data[1]
-            if data.__len__() > 2:
-                tam = data[2]
-                tam = tam.rstrip()
-            if acao == 'C':
-                print '[C p{} {}]'.format(int(nome[1:2]), int(tam))
-                self.criar(int(nome[1:2]), int(tam))
-            elif acao == 'A':
-                print '[A p{} {}]'.format(int(nome[1:2]), int(tam))
-                self.acessar(int(nome[1:2]), int(tam))
-            elif acao == 'M':
-                print '[M p{} {}]'.format(int(nome[1:2]), int(tam))
-                self.modificar(int(nome[1:2]), int(tam))
-            elif acao == 'T':
-                print '[T p{}]'.format(int(nome[1:2]))
-                self.matar_processo(int(nome[1:2]))
+        if self.modo == 'sequencial':
+            for linha in f:
+                data = linha.split(' ')
+                acao = data[0]
+                nome = data[1]
+                if data.__len__() > 2:
+                    tam = data[2]
+                    tam = tam.rstrip()
+                if acao == 'C':
+                    print '[C p{} {}]'.format(int(nome[1:2]), int(tam))
+                    self.criar(int(nome[1:2]), int(tam))
+                elif acao == 'A':
+                    print '[A p{} {}]'.format(int(nome[1:2]), int(tam))
+                    self.acessar(int(nome[1:2]), int(tam))
+                elif acao == 'M':
+                    print '[M p{} {}]'.format(int(nome[1:2]), int(tam))
+                    self.modificar(int(nome[1:2]), int(tam))
+                elif acao == 'T':
+                    print '[T p{}]'.format(int(nome[1:2]))
+                    self.matar_processo(int(nome[1:2]))
+        elif self.modo == 'aleatorio':
+            Thread(target=self.thread_func).start()
 
     def criar(self, nome, tam):
         if nome > self.MAX_PROCS or nome < 0:
@@ -143,7 +157,7 @@ class Logic:
             print 'Não é possivel modificar, pouca memoria'
             return
         if page_req > self.memoria_livre:
-            print 'Page Fault: {} Paginas que estão em memorias são necessarias \n Antes: \n'.format(
+            print 'Page Fault: {} Necessita de mais memória, enviando processo para disco \n Antes: \n'.format(
                 page_req - self.memoria_livre)
             self.status()
             self.send_to_disk(page_req - self.memoria_livre)

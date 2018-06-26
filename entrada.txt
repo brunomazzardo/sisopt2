@@ -1,3 +1,4 @@
+aleatorio
 lru
 8
 64
@@ -5,8 +6,6 @@ lru
 C p1 16
 C p2 18
 C p3 10
-T p1
-C p1 16
 A p1 14
 A p1 20
 A p2 17
@@ -26,9 +25,4 @@ A p2 18
 A p2 25
 A p3 0
 A p3 12
-A p1 6
-A p1 18
-A p1 8
-M p2 10
-A p2 20
 M p1 10
