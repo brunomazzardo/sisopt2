@@ -1,6 +1,7 @@
 # coding=utf-8
 from struct import Process, Page
 import time
+from random import randint
 
 
 class Logic:
@@ -11,7 +12,7 @@ class Logic:
     def run(self):
 
         f = open('./entrada.txt', 'r')
-
+        self.alg = f.readline().rstrip()
         self.tamanho_pagina = int(f.readline())
         self.tamanho_memoria = int(f.readline()) / self.tamanho_pagina
         self.tamanho_disco = int(f.readline()) / self.tamanho_pagina
@@ -40,7 +41,6 @@ class Logic:
                 self.criar(int(nome[1:2]), int(tam))
             elif acao == 'A':
                 print '[A p{} {}]'.format(int(nome[1:2]), int(tam))
-
                 self.acessar(int(nome[1:2]), int(tam))
             elif acao == 'M':
                 print '[M p{} {}]'.format(int(nome[1:2]), int(tam))
@@ -61,7 +61,7 @@ class Logic:
         if tam % self.tamanho_pagina != 0:
             page_req += 1
         if page_req > (self.memoria_livre + self.disco_livre):
-            print 'Não da pra cirar, pouca memoria'
+            print 'Não da pra criar, pouca memoria'
             return
         if page_req > self.memoria_livre:
             print 'Pages in memory required\nBefore:\n'
@@ -201,10 +201,18 @@ class Logic:
 
     def bring_from_disk(self, nome, page):
         time_now = 22222
-        for i in range(self.tamanho_memoria):
-            if self.memory[i].ultimo_acesso < time_now:
-                lru = i
-                time_now = self.memory[i].ultimo_acesso
+        print self.alg
+        print self.alg == 'lru'
+        if self.alg == 'lru':
+            for i in range(self.tamanho_memoria):
+                if self.memory[i].ultimo_acesso < time_now:
+                    lru = i
+                    time_now = self.memory[i].ultimo_acesso
+        else:
+            for _ in range(self.tamanho_memoria):
+                lru = randint(0, self.tamanho_memoria)
+                if self.memory[lru] is not None:
+                    break
 
         outro_nome = self.memory[lru].dono
         outra_page = self.memory[lru].posicao_lista
@@ -235,11 +243,13 @@ class Logic:
     def send_to_disk(self, amount):
         time_now = 22222
         disk_pos = 0
+        lru = randint(0, self.tamanho_memoria)
         for i in range(amount):
             for j in range(0, self.tamanho_memoria):
-                if self.memory[j].usando and self.memory[j].ultimo_acesso < time_now:
-                    lru = j
-                    time_now = self.memory[j].ultimo_acesso
+                if self.alg == 'lru':
+                    if self.memory[j].usando and self.memory[j].ultimo_acesso < time_now:
+                        lru = j
+                        time_now = self.memory[j].ultimo_acesso
             for c in range(0, self.tamanho_disco):
                 if not self.disk[c].usando:
                     disk_pos = c
