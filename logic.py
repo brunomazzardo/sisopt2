@@ -326,7 +326,7 @@ class Logic:
         self.memoria_livre += amount
         self.disco_livre -= amount
 
-    # funcao que envia para o disco
+    # funcao que mata o processo, seta como nao usando, tanto em disco como em memoria, e libera a memoria
     def matar_processo(self, nome):
         self.processos[nome].em_uso = False
         for i in range(0, self.tamanho_memoria):
