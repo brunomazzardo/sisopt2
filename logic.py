@@ -1,9 +1,11 @@
 # coding=utf-8
+
+
 from struct import Process, Page
 import time
 from random import randint
-from threading import Thread
 from numpy.random import choice
+from threading import Thread
 
 
 class Logic:
@@ -11,15 +13,22 @@ class Logic:
         self.contador_tempo = time.clock()
         self.MAX_PROCS = 15
         self.num_threads = 4
-        self.chance_morrer = 0.1
-        self.chance_alocar = 0.1
+        self.chance_morrer = 0.01
+        self.chance_alocar = 0.01
 
-    def thread_func(self):
-        print
+    def thread_func(self, idThread):
+        self.criar(idThread, randint(15, 25))
+        comando = self.comando_aleatorio(idThread)
+        while comando != 1:
+            if comando == 0:
+                self.acessar(idThread, randint(1, 30))
+            else:
+                self.modificar(idThread, randint(1, 25))
+            comando = self.comando_aleatorio(idThread)
 
     def comando_aleatorio(self, nome):
         chance_acessar = 1 - (self.chance_morrer + self.chance_alocar)
-        return choice(3, 1, p=[self.chance_alocar, self.chance_morrer, chance_acessar])
+        return choice(3, 1, p=[chance_acessar, self.chance_morrer, self.chance_alocar])
 
     def run(self):
         f = open('./entrada.txt', 'r')
@@ -61,7 +70,8 @@ class Logic:
                     print '[T p{}]'.format(int(nome[1:2]))
                     self.matar_processo(int(nome[1:2]))
         elif self.modo == 'aleatorio':
-            Thread(target=self.thread_func).start()
+            for _ in range(self.num_threads):
+                Thread(target=self.thread_func, args=[_]).start()
 
     def criar(self, nome, tam):
         if nome > self.MAX_PROCS or nome < 0:
@@ -105,7 +115,7 @@ class Logic:
         if page_fault:
             print 'Depois '
             self.status()
-        print str(nome) + ' processo criado com ' + str(tam) + 'com sucesso'
+        print str(nome) + ' processo criado com ' + str(tam) + ' bytes com sucesso'
         self.memoria_livre -= page_req
 
     def acessar(self, nome, tam):

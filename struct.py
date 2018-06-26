@@ -16,20 +16,3 @@ class Process:
         self.qtd_paginas = qtd_paginas
         self.em_uso = em_uso
         self.paginas = paginas
-
-#######################################CODIGO#########################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
