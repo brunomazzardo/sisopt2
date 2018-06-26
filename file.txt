@@ -1,0 +1,222 @@
+Tamanho da pagina: 8
+Tamanho da memoria: 8
+Tamanho do disco: 2
+[C p1 16]
+1 processo criado com 16 bytes com sucesso
+[C p2 18]
+2 processo criado com 18 bytes com sucesso
+[C p3 10]
+3 processo criado com 10 bytes com sucesso
+[A p1 14]
+Processo 1 accessou o byte numero 14 da pagina 1
+ 
+[A p1 20]
+Não foi possivel acessar o processo 1: Tentou acessar byte invalida20 [0, 15]
+
+[A p2 17]
+Processo 2 accessou o byte numero 17 da pagina 2
+ 
+[A p3 10]
+Não foi possivel acessar o processo 3: Tentou acessar byte invalida10 [0, 9]
+
+[M p1 8]
+Processo 1 modificado. 8 novos bytes [24]. 1 novas Paginas [3]
+
+[A p1 20]
+Processo 1 accessou o byte numero 20 da pagina 2
+ 
+[M p3 5]
+Processo 3 modificado. 5 novos bytes [15]. 0 novas paginas [2]
+[M p2 8]
+Page Fault: 1 Necessita de mais memória, enviando processo para disco 
+ Antes: 
+
+Memoria:     Disco:
+[0] = p 1, 0           [0] = --           
+[1] = p 1, 1           [1] = --           
+[2] = p 2, 0           
+[3] = p 2, 1           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Pagina 0 do processo 1, no frame 0 vai para disco...
+
+
+Depois 
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 1, 0           
+[1] = p 1, 1           [1] = --           
+[2] = p 2, 0           
+[3] = p 2, 1           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Processo 2 modificado. 8 novos bytes [26]. 1 novas Paginas [4]
+
+[A p1 1]
+
+Page Fault: Pagina 0 do processo1 não está em memoria
+Antes:
+
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 1, 0           
+[1] = p 1, 1           [1] = --           
+[2] = p 2, 0           
+[3] = p 2, 1           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Pagina 0 do processo 2, no frame 2 vai para disco
+
+
+Depois
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 2, 0           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 1           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Processo 1 accessou o byte numero 1 da pagina 0
+ 
+[A p2 20]
+Processo 2 accessou o byte numero 20 da pagina 2
+ 
+[A p1 5]
+Processo 1 accessou o byte numero 5 da pagina 0
+ 
+[A p1 17]
+Processo 1 accessou o byte numero 17 da pagina 2
+ 
+[A p1 20]
+Processo 1 accessou o byte numero 20 da pagina 2
+ 
+[A p2 7]
+
+Page Fault: Pagina 0 do processo2 não está em memoria
+Antes:
+
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 2, 0           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 1           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Pagina 1 do processo 2, no frame 3 vai para disco
+
+
+Depois
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 2, 1           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Processo 2 accessou o byte numero 7 da pagina 0
+ 
+[A p2 9]
+
+Page Fault: Pagina 1 do processo2 não está em memoria
+Antes:
+
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 2, 1           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 3, 0           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Pagina 0 do processo 3, no frame 5 vai para disco
+
+
+Depois
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 3, 0           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 2, 1           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Processo 2 accessou o byte numero 9 da pagina 1
+ 
+[A p2 18]
+Processo 2 accessou o byte numero 18 da pagina 2
+ 
+[A p2 25]
+Processo 2 accessou o byte numero 25 da pagina 3
+ 
+[A p3 0]
+
+Page Fault: Pagina 0 do processo3 não está em memoria
+Antes:
+
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 3, 0           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 2, 1           
+[6] = p 3, 1           
+[7] = p 1, 2           
+Pagina 1 do processo 3, no frame 6 vai para disco
+
+
+Depois
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 3, 1           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 2, 1           
+[6] = p 3, 0           
+[7] = p 1, 2           
+Processo 3 accessou o byte numero 0 da pagina 0
+ 
+[A p3 12]
+
+Page Fault: Pagina 1 do processo3 não está em memoria
+Antes:
+
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 3, 1           
+[1] = p 1, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 2, 1           
+[6] = p 3, 0           
+[7] = p 1, 2           
+Pagina 1 do processo 1, no frame 1 vai para disco
+
+
+Depois
+Memoria:     Disco:
+[0] = p 2, 3           [0] = p 1, 1           
+[1] = p 3, 1           [1] = --           
+[2] = p 1, 0           
+[3] = p 2, 0           
+[4] = p 2, 2           
+[5] = p 2, 1           
+[6] = p 3, 0           
+[7] = p 1, 2           
+Processo 3 accessou o byte numero 12 da pagina 1
+ 
+[M p1 10]
+Não é possivel modificar, pouca memoria

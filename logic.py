@@ -3,7 +3,7 @@
 # Bruno Barcellos Mazzardo e Lucas Demoliner
 # Sistema de paginacao usando lru e aleatorio
 # 26/06/2018
-
+import sys
 
 from struct import Process, Page
 import time
@@ -17,24 +17,31 @@ class Logic:
         # Tempo base para o LRU
         self.contador_tempo = time.clock()
         # Maximo de processos que podem existir
-        self.MAX_PROCS = 15
+        self.MAX_PROCS = 20
         # Numero que threads que podem existir
-        self.num_threads = 4
+        self.num_threads = 20
         # Chance de um processo morrer a cada comando
-        self.chance_morrer = 0.01
+        self.chance_morrer = 0.05
         # Chance de um processo querer alocar mais memoria
-        self.chance_alocar = 0.2
+        self.chance_alocar = 0.05
 
     # Funcao que deve ser executada pela thread, recebe o id da thread por parametro
     def thread_func(self, idThread):
-        self.criar(idThread, randint(15, 25))
+        rand_int = randint(15,25)
+        print '[C p{} {}]'.format(idThread, rand_int)
+        self.criar(idThread, randint(15, rand_int))
         comando = self.comando_aleatorio()
         while comando != 1:
             if comando == 0:
-                self.acessar(idThread, randint(1, 30))
+                rand_int = randint(1, 35)
+                print '[A p{} {}]'.format(idThread, rand_int)
+                self.acessar(idThread,rand_int)
             else:
-                self.modificar(idThread, randint(1, 25))
+                rand_int = randint(1, 25)
+                print '[A p{} {}]'.format(idThread, rand_int)
+                self.modificar(idThread, rand_int)
             comando = self.comando_aleatorio()
+        print '[M p{}]'.format(idThread)
         self.matar_processo(idThread)
 
     # Funcao que retorna o comando a ser executado, sendo 0 acessar,1 matar, 2 alocar mais memoria
@@ -45,6 +52,7 @@ class Logic:
 
     # Funcao que executa o progama, faz leitura do arquivo, inicializa as listas e decide o modo a ser executado
     def run(self):
+        sys.stdout = open('file.txt', 'w')
         f = open('./entrada.txt', 'r')
         # Leitura do modo de execucao
         self.modo = f.readline().rstrip()
@@ -114,7 +122,7 @@ class Logic:
             print 'Não da pra criar, pouca memoria'
             return
         if page_req > self.memoria_livre:
-            print 'Pages in memory required\nBefore:\n'
+            print 'Memoria necessaria\nAntes:\n'
             self.status()
             self.envia_para_disco(page_req - self.memoria_livre)
             page_fault = True
@@ -148,7 +156,7 @@ class Logic:
     def acessar(self, nome, tam):
 
         if nome > self.MAX_PROCS or nome < 0:
-            print 'OUT OF BOUNDS' + str(nome[1:2])
+            print 'Processo não existente' + str(nome[1:2])
             return
         if not self.processos[nome].em_uso:
             print 'Não foi possivel acessar o processo {}: Processo não inicializado\n'.format(nome)
@@ -255,8 +263,6 @@ class Logic:
     # funcao que pega processo do disco,
     def pega_no_disco(self, nome, page):
         time_now = 22222
-        print self.alg
-        print self.alg == 'lru'
         if self.alg == 'lru':
             for i in range(self.tamanho_memoria):
                 if self.memory[i].ultimo_acesso < time_now:
