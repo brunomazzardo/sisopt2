@@ -249,7 +249,7 @@ class Logic:
                 if self.memory[i].usando:
                     print '[{}] = p {}, {}          '.format(i, self.memory[i].dono, self.memory[i].posicao_lista),
                 else:
-                    print '[{}] = --          '.format(i)
+                    print '[{}] = --         '.format(i)
             else:
                 print '              ',
             if i < self.tamanho_disco:
