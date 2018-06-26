@@ -1,4 +1,4 @@
-from nofeeling import Logic
+from logic import Logic
 
 logic = Logic()
 

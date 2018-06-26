@@ -4,6 +4,8 @@
 C p1 16
 C p2 18
 C p3 10
+T p1
+C p1 16
 A p1 14
 A p1 20
 A p2 17

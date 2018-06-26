@@ -1,7 +1,6 @@
 # coding=utf-8
-from codigo.struct import Process, Page
+from struct import Process, Page
 import time
-import sys
 
 
 class Logic:
@@ -11,7 +10,6 @@ class Logic:
 
     def run(self):
 
-        sys.stdout = open('file', 'w')
         f = open('./entrada.txt', 'r')
 
         self.tamanho_pagina = int(f.readline())
@@ -31,14 +29,25 @@ class Logic:
         print 'Tamanho do disco: ' + str(self.tamanho_disco)
 
         for linha in f:
-            acao, nome, tam = linha.split(' ')
-            tam = tam.rstrip()
+            data = linha.split(' ')
+            acao = data[0]
+            nome = data[1]
+            if data.__len__() > 2:
+                tam = data[2]
+                tam = tam.rstrip()
             if acao == 'C':
+                print '[C p{} {}]'.format(int(nome[1:2]), int(tam))
                 self.criar(int(nome[1:2]), int(tam))
             elif acao == 'A':
+                print '[A p{} {}]'.format(int(nome[1:2]), int(tam))
+
                 self.acessar(int(nome[1:2]), int(tam))
-            else:
+            elif acao == 'M':
+                print '[M p{} {}]'.format(int(nome[1:2]), int(tam))
                 self.modificar(int(nome[1:2]), int(tam))
+            elif acao == 'T':
+                print '[T p{}]'.format(int(nome[1:2]))
+                self.matar_processo(int(nome[1:2]))
 
     def criar(self, nome, tam):
         if nome > self.MAX_PROCS or nome < 0:
@@ -52,7 +61,7 @@ class Logic:
         if tam % self.tamanho_pagina != 0:
             page_req += 1
         if page_req > (self.memoria_livre + self.disco_livre):
-            print 'Não da pra cirar, puca memoria'
+            print 'Não da pra cirar, pouca memoria'
             return
         if page_req > self.memoria_livre:
             print 'Pages in memory required\nBefore:\n'
@@ -91,36 +100,38 @@ class Logic:
             print 'OUT OF BOUNDS' + str(nome[1:2])
             return
         if not self.processos[nome].em_uso:
-            print 'cannot access p{}: processo não inicializado\n'.format(nome)
+            print 'Não foi possivel acessar o processo {}: Processo não inicializado\n'.format(nome)
             return
         if tam >= self.processos[nome].qtd_byte or tam < 0:
-            print 'Cannot access p{}: Tried to access byte {} [0, {}]\n'.format(nome, tam,
-                                                                                self.processos[nome].qtd_byte - 1)
+            print 'Não foi possivel acessar o processo {}: Tentou acessar byte invalida{} [0, {}]\n'.format(nome, tam,
+                                                                                                            self.processos[
+                                                                                                                nome].qtd_byte - 1)
             return
         page_req = tam / self.tamanho_pagina
         if not self.processos[nome].paginas[page_req].na_memoria:
-            print '\nPage Fault: Page {} from p{} not in memory\nBefore:\n'.format(page_req, nome)
+            print '\nPage Fault: Pagina {} do processo{} não está em memoria\nAntes:\n'.format(page_req, nome)
             self.status()
             self.bring_from_disk(nome, page_req)
             print 'Depois'
             self.status()
         self.memory[self.processos[nome].paginas[page_req].posicao_memoria].ultimo_acesso = time.clock()
-        print  'p{} accessed byte {} from page {}\n '.format(nome, tam, page_req)
+        print  'Processo {} accessou o byte numero {} da pagina {}\n '.format(nome, tam, page_req)
 
     def modificar(self, nome, tam):
         novo_tam = self.processos[nome].qtd_byte + tam
         page_fault = 0
 
         if nome > self.MAX_PROCS or nome < 0:
-            print 'Não deu pra criar o processo de id ' + str(nome[1:2])
+            print 'Impossivel criar o processo de id ' + str(nome[1:2])
             return
         if not self.processos[nome].em_uso:
-            print 'processo não existe'
+            print 'Processo não existente'
             return
         if novo_tam < self.tamanho_pagina * self.processos[nome].qtd_paginas:
             self.processos[nome].qtd_byte = novo_tam
-            print 'p{}d modified. {} new bytes [{}]. 0 new Pages [{}]'.format(nome, tam, novo_tam,
-                                                                              self.processos[nome].qtd_paginas)
+            print 'Processo {} modificado. {} novos bytes [{}]. 0 novas paginas [{}]'.format(nome, tam, novo_tam,
+                                                                                             self.processos[
+                                                                                                 nome].qtd_paginas)
             return
         tam_extra = novo_tam - self.tamanho_pagina * self.processos[nome].qtd_paginas
 
@@ -129,10 +140,11 @@ class Logic:
         if tam_extra % self.tamanho_pagina != 0:
             page_req += 1
         if page_req > (self.memoria_livre + self.disco_livre):
-            print 'não da pra modificar, pouca memoria'
+            print 'Não é possivel modificar, pouca memoria'
             return
         if page_req > self.memoria_livre:
-            print 'Page Fault: {} Pages in memory required \n Before: \n'.format(page_req - self.memoria_livre)
+            print 'Page Fault: {} Paginas que estão em memorias são necessarias \n Antes: \n'.format(
+                page_req - self.memoria_livre)
             self.status()
             self.send_to_disk(page_req - self.memoria_livre)
             page_fault = True
@@ -159,12 +171,14 @@ class Logic:
         if page_fault:
             print 'Depois '
             self.status()
-        print 'p{} modified. {} new bytes [{}]. {} new Pages [{}]\n'.format(nome, tam, novo_tam, page_req,
-                                                                            self.processos[nome].qtd_paginas)
+        print 'Processo {} modificado. {} novos bytes [{}]. {} novas Paginas [{}]\n'.format(nome, tam, novo_tam,
+                                                                                            page_req,
+                                                                                            self.processos[
+                                                                                                nome].qtd_paginas)
         self.memoria_livre -= page_req
 
     def status(self):
-        print 'Memoria:     Disk:'
+        print 'Memoria:     Disco:'
         if self.tamanho_memoria > self.tamanho_disco:
             max = self.tamanho_memoria
         else:
@@ -195,8 +209,8 @@ class Logic:
         outro_nome = self.memory[lru].dono
         outra_page = self.memory[lru].posicao_lista
         disk_pos = self.processos[nome].paginas[page].posicao_memoria
-        print 'Page {} from p{}, on Frame {} goes to disk...\n\n'.format(self.memory[lru].posicao_lista,
-                                                                         self.memory[lru].dono, lru)
+        print 'Pagina {} do processo {}, no frame {} vai para disco\n\n'.format(self.memory[lru].posicao_lista,
+                                                                                self.memory[lru].dono, lru)
         if not self.memory[lru].usando:
             self.memoria_livre -= 1
             self.disco_livre += 1
@@ -223,7 +237,6 @@ class Logic:
         disk_pos = 0
         for i in range(amount):
             for j in range(0, self.tamanho_memoria):
-                print time_now
                 if self.memory[j].usando and self.memory[j].ultimo_acesso < time_now:
                     lru = j
                     time_now = self.memory[j].ultimo_acesso
@@ -231,9 +244,9 @@ class Logic:
                 if not self.disk[c].usando:
                     disk_pos = c
                     break
-            print 'Page {} from {}, on Frame {} goes to disk...\n\n'.format(self.memory[lru].posicao_lista,
-                                                                            self.memory[lru].dono,
-                                                                            lru)
+            print 'Pagina {} do processo {}, no frame {} vai para disco...\n\n'.format(self.memory[lru].posicao_lista,
+                                                                                       self.memory[lru].dono,
+                                                                                       lru)
             self.disk[disk_pos].na_memoria = False
             self.disk[disk_pos].usando = True
             self.disk[disk_pos].ultimo_acesso = self.memory[lru].ultimo_acesso
@@ -247,3 +260,16 @@ class Logic:
 
         self.memoria_livre += amount
         self.disco_livre -= amount
+
+    def matar_processo(self, nome):
+        self.processos[nome].em_uso = False
+        for i in range(0, self.tamanho_memoria):
+            if self.memory[i].dono == nome:
+                self.memory[i].usando = False
+                self.memoria_livre += 1
+        for i in range(0, self.tamanho_disco):
+            if self.disk[i].dono == nome:
+                self.disk[i].usando = False
+                self.disco_livre += 1
+
+        print 'Processo {} finalizado'.format(nome)
