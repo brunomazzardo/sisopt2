@@ -1,5 +1,9 @@
 # coding=utf-8
 
+# Bruno Barcellos Mazzardo e Lucas Demoliner
+# Sistema de paginacao usando lru e aleatorio
+# 26/06/2018
+
 
 from struct import Process, Page
 import time
@@ -16,20 +20,25 @@ class Logic:
         self.chance_morrer = 0.01
         self.chance_alocar = 0.01
 
+    # Funcao que deve ser executada pela thread, recebe o id da thread por parametro
     def thread_func(self, idThread):
         self.criar(idThread, randint(15, 25))
-        comando = self.comando_aleatorio(idThread)
+        comando = self.comando_aleatorio()
         while comando != 1:
             if comando == 0:
                 self.acessar(idThread, randint(1, 30))
             else:
                 self.modificar(idThread, randint(1, 25))
-            comando = self.comando_aleatorio(idThread)
+            comando = self.comando_aleatorio()
+        self.matar_processo(idThread)
 
-    def comando_aleatorio(self, nome):
+    # Funcao que retorna o comando a ser executado, sendo 0 acessar,1 matar, 2 alocar mais memoria
+    def comando_aleatorio(self):
         chance_acessar = 1 - (self.chance_morrer + self.chance_alocar)
+        # Uso da biblioteca numpy, que fornece o metodo choice, que permite balancear os odds de uma geracao randomica
         return choice(3, 1, p=[chance_acessar, self.chance_morrer, self.chance_alocar])
 
+    # Funcao que executa o progama, faz leitura do arquivo, inicializa as listas e decide o modo a ser executado
     def run(self):
         f = open('./entrada.txt', 'r')
         self.modo = f.readline().rstrip()
@@ -73,6 +82,7 @@ class Logic:
             for _ in range(self.num_threads):
                 Thread(target=self.thread_func, args=[_]).start()
 
+    # Funcao que cria um processo, recebe seu id e seu nome
     def criar(self, nome, tam):
         if nome > self.MAX_PROCS or nome < 0:
             print 'Não deu pra criar o processo de id ' + str(nome[1:2])
@@ -90,7 +100,7 @@ class Logic:
         if page_req > self.memoria_livre:
             print 'Pages in memory required\nBefore:\n'
             self.status()
-            self.send_to_disk(page_req - self.memoria_livre)
+            self.envia_para_disco(page_req - self.memoria_livre)
             page_fault = True
 
         self.processos[nome].qtd_byte = tam
@@ -118,6 +128,7 @@ class Logic:
         print str(nome) + ' processo criado com ' + str(tam) + ' bytes com sucesso'
         self.memoria_livre -= page_req
 
+    # Funcao que acessa um processo, recebe seu nome e o byte que quer acessar
     def acessar(self, nome, tam):
 
         if nome > self.MAX_PROCS or nome < 0:
@@ -135,12 +146,13 @@ class Logic:
         if not self.processos[nome].paginas[page_req].na_memoria:
             print '\nPage Fault: Pagina {} do processo{} não está em memoria\nAntes:\n'.format(page_req, nome)
             self.status()
-            self.bring_from_disk(nome, page_req)
+            self.pega_no_disco(nome, page_req)
             print 'Depois'
             self.status()
         self.memory[self.processos[nome].paginas[page_req].posicao_memoria].ultimo_acesso = time.clock()
         print  'Processo {} accessou o byte numero {} da pagina {}\n '.format(nome, tam, page_req)
 
+    # funcao que modifica um processo, alocando mais espaço, recebe um nome e um espaço extra que é desejado
     def modificar(self, nome, tam):
         novo_tam = self.processos[nome].qtd_byte + tam
         page_fault = 0
@@ -170,7 +182,7 @@ class Logic:
             print 'Page Fault: {} Necessita de mais memória, enviando processo para disco \n Antes: \n'.format(
                 page_req - self.memoria_livre)
             self.status()
-            self.send_to_disk(page_req - self.memoria_livre)
+            self.envia_para_disco(page_req - self.memoria_livre)
             page_fault = True
         self.processos[nome].qtd_byte = novo_tam
         self.processos[nome].qtd_paginas += page_req
@@ -201,6 +213,7 @@ class Logic:
                                                                                                 nome].qtd_paginas)
         self.memoria_livre -= page_req
 
+    # funcao que imprime a memoria e disco formatados com seu conteudo
     def status(self):
         print 'Memoria:     Disco:'
         if self.tamanho_memoria > self.tamanho_disco:
@@ -223,7 +236,8 @@ class Logic:
 
             print ''
 
-    def bring_from_disk(self, nome, page):
+    # funcao que pega processo do disco,
+    def pega_no_disco(self, nome, page):
         time_now = 22222
         print self.alg
         print self.alg == 'lru'
@@ -264,7 +278,8 @@ class Logic:
         self.processos[nome].paginas[page] = self.memory[lru]
         self.processos[outro_nome].paginas[outra_page] = self.disk[disk_pos]
 
-    def send_to_disk(self, amount):
+    # funcao que envia para o disco
+    def envia_para_disco(self, amount):
         time_now = 22222
         disk_pos = 0
         lru = randint(0, self.tamanho_memoria)
@@ -295,6 +310,7 @@ class Logic:
         self.memoria_livre += amount
         self.disco_livre -= amount
 
+    # funcao que envia para o disco
     def matar_processo(self, nome):
         self.processos[nome].em_uso = False
         for i in range(0, self.tamanho_memoria):

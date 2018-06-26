@@ -1,3 +1,9 @@
+#Bruno Barcellos Mazzardo e Lucas Demoliner
+#Sistema de paginacao usando lru e aleatorio
+#26/06/2018
+
+
+
 class Page:
 
     def __init__(self,na_memoria,usando,dono,posicao_lista,posicao_memoria,ultimo_acesso):

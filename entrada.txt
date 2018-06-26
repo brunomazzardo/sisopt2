@@ -1,4 +1,4 @@
-aleatorio
+sequencial
 lru
 8
 64
