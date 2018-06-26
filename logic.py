@@ -23,7 +23,7 @@ class Logic:
         # Chance de um processo morrer a cada comando
         self.chance_morrer = 0.01
         # Chance de um processo querer alocar mais memoria
-        self.chance_alocar = 0.01
+        self.chance_alocar = 0.2
 
     # Funcao que deve ser executada pela thread, recebe o id da thread por parametro
     def thread_func(self, idThread):
@@ -263,10 +263,7 @@ class Logic:
                     lru = i
                     time_now = self.memory[i].ultimo_acesso
         else:
-            for _ in range(self.tamanho_memoria):
-                lru = randint(0, self.tamanho_memoria)
-                if self.memory[lru] is not None:
-                    break
+            lru = self.posicao_aleatoria()
 
         outro_nome = self.memory[lru].dono
         outra_page = self.memory[lru].posicao_lista
@@ -294,11 +291,20 @@ class Logic:
         self.processos[nome].paginas[page] = self.memory[lru]
         self.processos[outro_nome].paginas[outra_page] = self.disk[disk_pos]
 
+    def posicao_aleatoria(self):
+        for _ in range(self.tamanho_memoria):
+            lru = randint(0, self.tamanho_memoria)
+            try:
+                if self.memory[lru] is not None:
+                    return lru
+            except IndexError:
+                pass
+
     # funcao que envia para o disco
     def envia_para_disco(self, amount):
         time_now = 22222
         disk_pos = 0
-        lru = randint(0, self.tamanho_memoria)
+        lru = self.posicao_aleatoria()
         for i in range(amount):
             for j in range(0, self.tamanho_memoria):
                 if self.alg == 'lru':
