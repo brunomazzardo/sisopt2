@@ -1,12 +1,11 @@
-#Bruno Barcellos Mazzardo e Lucas Demoliner
-#Sistema de paginacao usando lru e aleatorio
-#26/06/2018
-
+# Bruno Barcellos Mazzardo e Lucas Demoliner
+# Sistema de paginacao usando lru e aleatorio
+# 26/06/2018
 
 
 class Page:
 
-    def __init__(self,na_memoria,usando,dono,posicao_lista,posicao_memoria,ultimo_acesso):
+    def __init__(self, na_memoria, usando, dono, posicao_lista, posicao_memoria, ultimo_acesso):
         self.na_memoria = na_memoria
         self.usando = usando
         self.dono = dono
@@ -17,7 +16,7 @@ class Page:
 
 class Process:
 
-    def __init__(self,qtd_byte,qtd_paginas,em_uso,paginas):
+    def __init__(self, qtd_byte, qtd_paginas, em_uso, paginas):
         self.qtd_byte = qtd_byte
         self.qtd_paginas = qtd_paginas
         self.em_uso = em_uso

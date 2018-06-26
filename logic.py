@@ -14,10 +14,15 @@ from threading import Thread
 
 class Logic:
     def __init__(self):
+        # Tempo base para o LRU
         self.contador_tempo = time.clock()
+        # Maximo de processos que podem existir
         self.MAX_PROCS = 15
+        # Numero que threads que podem existir
         self.num_threads = 4
+        # Chance de um processo morrer a cada comando
         self.chance_morrer = 0.01
+        # Chance de um processo querer alocar mais memoria
         self.chance_alocar = 0.01
 
     # Funcao que deve ser executada pela thread, recebe o id da thread por parametro
@@ -41,23 +46,34 @@ class Logic:
     # Funcao que executa o progama, faz leitura do arquivo, inicializa as listas e decide o modo a ser executado
     def run(self):
         f = open('./entrada.txt', 'r')
+        # Leitura do modo de execucao
         self.modo = f.readline().rstrip()
+        # Leitura do algoritmo
         self.alg = f.readline().rstrip()
+        # Leitura do tamanho da pagina
         self.tamanho_pagina = int(f.readline())
+        # Leitura do tamanho da memoria
         self.tamanho_memoria = int(f.readline()) / self.tamanho_pagina
+        # Leitura do tamanho do disco
         self.tamanho_disco = int(f.readline()) / self.tamanho_pagina
+        # Inicializando a lista de processos
         self.processos = [
             Process(0, 0, 0, [Page(0, 0, 0, 0, 0, 0) for _ in range(0, self.tamanho_memoria + self.tamanho_disco)]) for
             _ in range(self.MAX_PROCS)]
+        # Inicializando a memoria
         self.memory = [Page(0, 0, 0, 0, 0, 0) for _ in range(0, self.tamanho_memoria)]
+        # Inicializando o disco
         self.disk = [Page(0, 0, 0, 0, 0, 0) for _ in range(0, self.tamanho_disco)]
-
+        # Definindo a quantidade de disco livre
         self.disco_livre = self.tamanho_disco
+        # Definindo a quantidade de disco livre
         self.memoria_livre = self.tamanho_memoria
 
         print 'Tamanho da pagina: ' + str(self.tamanho_memoria)
         print 'Tamanho da memoria: ' + str(self.tamanho_memoria)
         print 'Tamanho do disco: ' + str(self.tamanho_disco)
+
+        # Dependendo do modo, procede com os comandos
         if self.modo == 'sequencial':
             for linha in f:
                 data = linha.split(' ')
